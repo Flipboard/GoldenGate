@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/GoldenGate.iml" filepath="$PROJECT_DIR$/GoldenGate.iml" />
+      <module fileurl="file://$PROJECT_DIR$/GolderGate.iml" filepath="$PROJECT_DIR$/GolderGate.iml" />
+      <module fileurl="file://$PROJECT_DIR$/api/api.iml" filepath="$PROJECT_DIR$/api/api.iml" />
+      <module fileurl="file://$PROJECT_DIR$/compiler/compiler.iml" filepath="$PROJECT_DIR$/compiler/compiler.iml" />
+      <module fileurl="file://$PROJECT_DIR$/sample/sample.iml" filepath="$PROJECT_DIR$/sample/sample.iml" />
+    </modules>
+  </component>
+</project>
+
