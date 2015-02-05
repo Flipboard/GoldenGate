@@ -54,12 +54,12 @@ public class BridgeProperty {
                     .build());
 
             methodSpec.addCode(CodeBlock.builder()
-                    .addStatement("this.webView.loadUrl(\"javascript:$L.onResult(JSON.stringify({receiver:\"+uuid+\", result:$L()});\")", bridgeName, name)
+                    .addStatement("this.webView.loadUrl(\"javascript:$L.onResult(JSON.stringify({receiver:\"+uuid+\", result:$L});\")", bridgeName, name)
                     .build());
         } else {
             methodSpec.addParameter(TypeName.get(parameter.type), parameter.name, Modifier.FINAL);
             methodSpec.addCode(CodeBlock.builder()
-                    .addStatement("this.webView.loadUrl(\"javascript:$L(\"+toJson($L)+\");\")", name, parameter.name)
+                    .addStatement("this.webView.loadUrl(\"javascript:$L = \"+toJson($L)+\";\")", name, parameter.name)
                     .build());
         }
 
