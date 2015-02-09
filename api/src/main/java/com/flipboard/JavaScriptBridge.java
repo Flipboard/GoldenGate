@@ -1,5 +1,6 @@
 package com.flipboard;
 
+import android.util.Base64;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 
@@ -63,9 +64,9 @@ public abstract class JavaScriptBridge {
     }
 
     protected String randomUUID() {
-        byte[] randBytes = new byte[64];
+        byte[] randBytes = new byte[128];
         random.nextBytes(randBytes);
-        return new String(randBytes);
+        return Base64.encodeToString(randBytes, Base64.URL_SAFE);
     }
 
     public static void setJsonSerializer(JsonSerializer serializer) {
