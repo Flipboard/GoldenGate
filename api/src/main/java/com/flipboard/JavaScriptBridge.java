@@ -66,7 +66,7 @@ public abstract class JavaScriptBridge {
     protected String randomUUID() {
         byte[] randBytes = new byte[128];
         random.nextBytes(randBytes);
-        return Base64.encodeToString(randBytes, Base64.URL_SAFE);
+        return Base64.encodeToString(randBytes, Base64.URL_SAFE | Base64.NO_WRAP);
     }
 
     public static void setJsonSerializer(JsonSerializer serializer) {
