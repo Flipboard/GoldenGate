@@ -54,7 +54,7 @@ public class BridgeProperty {
                     .build());
 
             CodeBlock.Builder codeBlock = CodeBlock.builder();
-            codeBlock.addStatement("$T javascript = \"$L.onResult(JSON.stringify({receiver:\\\"\"+uuid+\"\\\", result:$L});\"", String.class, bridge.name, name);
+            codeBlock.addStatement("$T javascript = \"$L.onResult(JSON.stringify({receiver:\\\"\"+uuid+\"\\\", result:$L}));\"", String.class, bridge.name, name);
             if (bridge.isDebug) {
                 codeBlock.addStatement("android.util.Log.d($S, javascript)", bridge.name);
             }
