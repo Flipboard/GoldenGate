@@ -2,8 +2,10 @@ package com.flipboard.animation;
 
 import com.flipboard.Bridge;
 import com.flipboard.Callback;
+import com.flipboard.Debug;
 import com.flipboard.Property;
 
+@Debug
 @Bridge
 public interface Flipmag {
 

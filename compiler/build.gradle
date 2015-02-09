@@ -2,7 +2,7 @@ apply plugin: 'java'
 apply plugin: 'maven'
 
 sourceCompatibility = 1.7
-version = "1.0.1"
+version = "1.0.2"
 group = "com.flipboard.goldengate"
 
 configurations {

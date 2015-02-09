@@ -34,7 +34,7 @@ public class BridgeProperty {
         }
     }
 
-    public MethodSpec toMethodSpec(String bridgeName) {
+    public MethodSpec toMethodSpec(BridgeInterface bridge) {
         MethodSpec.Builder methodSpec = MethodSpec.methodBuilder(javaName).addModifiers(Modifier.PUBLIC);
 
         if (callback != null) {
@@ -53,14 +53,22 @@ public class BridgeProperty {
                     .addStatement("})")
                     .build());
 
-            methodSpec.addCode(CodeBlock.builder()
-                    .addStatement("this.webView.loadUrl(\"javascript:$L.onResult(JSON.stringify({receiver:\"+uuid+\", result:$L});\")", bridgeName, name)
-                    .build());
+            CodeBlock.Builder codeBlock = CodeBlock.builder();
+            codeBlock.addStatement("$T javascript = \"$L.onResult(JSON.stringify({receiver:\"+uuid+\", result:$L});\"", String.class, bridge.name, name);
+            if (bridge.isDebug) {
+                codeBlock.addStatement("android.util.Log.d($S, javascript)", bridge.name);
+            }
+            codeBlock.addStatement("this.webView.loadUrl(\"javascript:\" + javascript)");
+            methodSpec.addCode(codeBlock.build());
         } else {
             methodSpec.addParameter(TypeName.get(parameter.type), parameter.name, Modifier.FINAL);
-            methodSpec.addCode(CodeBlock.builder()
-                    .addStatement("this.webView.loadUrl(\"javascript:$L = \"+toJson($L)+\";\")", name, parameter.name)
-                    .build());
+            CodeBlock.Builder codeBlock = CodeBlock.builder();
+            codeBlock.addStatement("$T javascript = \"$L = \"+toJson($L)+\";\"", String.class, name, parameter.name);
+            if (bridge.isDebug) {
+                codeBlock.addStatement("android.util.Log.d($S, javascript)", bridge.name);
+            }
+            codeBlock.addStatement("this.webView.loadUrl(\"javascript:\" + javascript)");
+            methodSpec.addCode(codeBlock.build());
         }
 
         return methodSpec.build();

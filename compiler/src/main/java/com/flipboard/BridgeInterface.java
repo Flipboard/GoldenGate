@@ -18,13 +18,15 @@ import javax.lang.model.type.TypeMirror;
 
 public class BridgeInterface {
 
-    private String name;
+    public final String name;
+    public final boolean isDebug;
     private TypeMirror type;
     private ArrayList<BridgeMethod> bridgeMethods = new ArrayList<>();
     private ArrayList<BridgeProperty> bridgeProperties = new ArrayList<>();
 
     public BridgeInterface(Element element) {
         this.name = element.getSimpleName().toString();
+        this.isDebug = element.getAnnotation(Debug.class) != null;
         this.type = element.asType();
 
         for (Element method : element.getEnclosedElements()) {
@@ -55,12 +57,12 @@ public class BridgeInterface {
 
         // Add Bridge methods
         for (BridgeMethod method : bridgeMethods) {
-            bridge.addMethod(method.toMethodSpec(name));
+            bridge.addMethod(method.toMethodSpec(this));
         }
 
         // Add Bridge property methods
         for (BridgeProperty property : bridgeProperties) {
-            bridge.addMethod(property.toMethodSpec(name));
+            bridge.addMethod(property.toMethodSpec(this));
         }
 
         // Write source
