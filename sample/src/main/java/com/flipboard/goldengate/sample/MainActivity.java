@@ -7,9 +7,9 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
 
-import com.flipboard.bridge.FlipmagBridge;
 import com.flipboard.goldengate.Callback;
 import com.flipboard.goldengate.R;
+import com.flipboard.goldengate.bridge.FlipmagBridge;
 
 
 public class MainActivity extends ActionBarActivity {

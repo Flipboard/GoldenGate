@@ -2,13 +2,21 @@ package com.flipboard.goldengate;
 
 import android.webkit.WebView;
 
+import com.google.gson.reflect.TypeToken;
+import com.squareup.javapoet.AnnotationSpec;
+import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.CodeBlock;
+import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.annotation.processing.Filer;
 import javax.lang.model.element.Element;
@@ -43,7 +51,37 @@ public class BridgeInterface {
         TypeSpec.Builder bridge = TypeSpec.classBuilder(name + "Bridge")
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
                 .addSuperinterface(TypeName.get(type))
-                .superclass(JavaScriptBridge.class);
+                .superclass(JavaScriptBridge.class)
+                .addField(ClassName.get("com.flipboard.goldengate.bridge", name + "Bridge", "ResultBridge"), "resultBridge", Modifier.PRIVATE);
+
+        Type callbacksMapType = new TypeToken<Map<String, Callback<String>>>(){}.getType();
+        Type callbackType = new TypeToken<Callback<String>>(){}.getType();
+
+        // Generate the result bridge
+        bridge.addType(TypeSpec.classBuilder("ResultBridge")
+                .addField(FieldSpec.builder(callbacksMapType, "callbacks")
+                        .initializer("new $T<>()", HashMap.class)
+                        .build())
+                .addMethod(MethodSpec.methodBuilder("registerCallback")
+                        .addParameter(String.class, "receiver")
+                        .addParameter(callbackType, "cb")
+                        .addCode(CodeBlock.builder().addStatement("callbacks.put($N, $N)", "receiver", "cb").build())
+                        .build())
+                .addMethod(MethodSpec.methodBuilder("onResult")
+                        .addAnnotation(ClassName.get("android.webkit", "JavascriptInterface"))
+                        .addParameter(String.class, "result")
+                        .addCode(CodeBlock.builder()
+                                .beginControlFlow("try")
+                                    .addStatement("$T $N = new $T($N)", ClassName.get("org.json", "JSONObject"), "json", ClassName.get("org.json", "JSONObject"), "result")
+                                    .addStatement("$T $N = $N.getString($S)", String.class, "receiver", "json", "\"receiver\"")
+                                    .addStatement("$T $N = $N.get($S).toString()", String.class, "realResult", "json", "\"result\"")
+                                    .addStatement("$N.remove($N).onResult($N)", "callbacks", "receiver", "realResult")
+                                .nextControlFlow("catch (org.json.JSONException e)")
+                                    .addStatement("$N.printStackTrace()", "e")
+                                .endControlFlow()
+                                .build())
+                        .build())
+                .build());
 
         // Add Bridge constructor
         bridge.addMethod(
@@ -51,7 +89,8 @@ public class BridgeInterface {
                         .addModifiers(Modifier.PUBLIC)
                         .addParameter(WebView.class, "webView")
                         .addStatement("super($N)", "webView")
-                        .addStatement("this.webView.addJavascriptInterface($N, $L)", "resultBridge", "\"" + name + "\"")
+                        .addStatement("this.$N = new ResultBridge()", "resultBridge")
+                        .addStatement("this.$N.addJavascriptInterface($N, $L)", "webView", "resultBridge", "\"" + name + "\"")
                         .build()
         );
 
@@ -66,7 +105,7 @@ public class BridgeInterface {
         }
 
         // Write source
-        JavaFile javaFile = JavaFile.builder("com.flipboard.bridge", bridge.build()).build();
+        JavaFile javaFile = JavaFile.builder("com.flipboard.goldengate.bridge", bridge.build()).build();
         javaFile.writeTo(filer);
     }
 
