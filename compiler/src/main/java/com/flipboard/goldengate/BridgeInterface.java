@@ -1,4 +1,4 @@
-package com.flipboard;
+package com.flipboard.goldengate;
 
 import android.webkit.WebView;
 

@@ -1,11 +1,8 @@
-package com.flipboard;
+package com.flipboard.goldengate;
 
 import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeName;
-
-import java.util.Base64;
-import java.util.Random;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;

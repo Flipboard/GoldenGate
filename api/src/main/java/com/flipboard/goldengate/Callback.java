@@ -1,4 +1,4 @@
-package com.flipboard;
+package com.flipboard.goldengate;
 
 /**
  * Callback used to get results from a javascript call

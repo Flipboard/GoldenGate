@@ -1,4 +1,4 @@
-package com.flipboard;
+package com.flipboard.goldengate;
 
 import javax.lang.model.element.Element;
 

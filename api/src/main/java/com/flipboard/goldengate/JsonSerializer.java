@@ -1,4 +1,4 @@
-package com.flipboard;
+package com.flipboard.goldengate;
 
 public interface JsonSerializer {
 

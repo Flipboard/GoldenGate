@@ -1,9 +1,9 @@
-package com.flipboard.animation;
+package com.flipboard.goldengate.sample;
 
-import com.flipboard.Bridge;
-import com.flipboard.Callback;
-import com.flipboard.Method;
-import com.flipboard.Property;
+import com.flipboard.goldengate.Bridge;
+import com.flipboard.goldengate.Callback;
+import com.flipboard.goldengate.Method;
+import com.flipboard.goldengate.Property;
 
 @Bridge
 public interface Test {

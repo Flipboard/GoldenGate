@@ -1,4 +1,4 @@
-package com.flipboard;
+package com.flipboard.goldengate;
 
 import android.util.Base64;
 import android.webkit.JavascriptInterface;

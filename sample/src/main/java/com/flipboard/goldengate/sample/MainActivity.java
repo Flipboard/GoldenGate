@@ -1,17 +1,15 @@
-package com.flipboard.animation;
+package com.flipboard.goldengate.sample;
 
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.webkit.JavascriptInterface;
+import android.support.v7.app.ActionBarActivity;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
 
-import com.flipboard.Callback;
 import com.flipboard.bridge.FlipmagBridge;
+import com.flipboard.goldengate.Callback;
+import com.flipboard.goldengate.R;
 
 
 public class MainActivity extends ActionBarActivity {
