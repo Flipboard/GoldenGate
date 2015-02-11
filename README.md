@@ -1,6 +1,6 @@
 GoldenGate
 ==========
-Android annotation processor for generating type safe javascript bindings (Bridges). The library is very similar in usage to something like retrofit in that only an interface has to be declared and annotated. This annotated interface is at compile time used to generate an type safe wrapper around a webview for interfacing with the javascript.
+GoldenGate is an Android annotation processor for generating type safe javascript bindings (Bridges). The library is very similar in usage to something like retrofit in that only an interface has to be declared and annotated (though retrofit does not do any compile time code generating). This annotated interface is at compile time used to generate an type safe wrapper around a webview for interfacing with the javascript.
 
 Usage
 -----
@@ -19,12 +19,21 @@ MyJavascript bridge = new MyJavascriptBridge(webview);
 bridge.alert("Hi there!");
 ```
 
-The above example is just a fire and forget example though. We often want to get some result back. For this we have `Callback<T>`, because javascript runs asynchronously we can't just return this value and must therefor use a callback. The callback argument must allways be the argument specified last in the method decleration. Here is an example of `Callback<T>`.
+The above example is just a fire and forget example. We often want to get some result back. For this we have `Callback<T>`, because javascript runs asynchronously we can't just return this value and must therefor use a callback. The callback argument must allways be the argument specified last in the method decleration. Here is an example of using `Callback<T>`.
 ```java
 @Bridge
 interface MyJavascript {
 	void calculateSomeValue(Callback<Integer> value);
 }
+
+Webview webview = ...;
+MyJavascript bridge = new MyJavascriptBridge(webview);
+bridge.calculateSomeValue(new Callback<Integer>() {
+	@Override
+	void onResult(Integer result) {
+		// do something with result
+	}
+});
 ```
 
 That's it for simple usage! There are two other annotations for customized usage, `@Method` and `@Property`. `@Method` can be used to override the name of the method on the javascript side of the bridge (The java name of the method is automatically chosen if this annotation is not supplied).
@@ -42,5 +51,14 @@ The `@Property` annotation should be used for when setting or getting a property
 interface MyJavascript {
 	@Property("window.innerHeight")
 	void getWindowHeight(Callback<Integer> height);
+}
+```
+
+And lastly if things aren't working as expected there is a `@Debug` annotation that can be added to your `@Bridge` annotated interface which will cause the javascript being executed to be logged to the console beforehand.
+```java
+@Debug
+@Bridge
+interface MyJavascript {
+	void alert(String message);
 }
 ```
