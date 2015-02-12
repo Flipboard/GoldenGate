@@ -8,7 +8,6 @@ import android.webkit.WebViewClient;
 import android.widget.Toast;
 
 import com.flipboard.goldengate.Callback;
-import com.flipboard.goldengate.R;
 import com.flipboard.goldengate.bridge.SampleBridge;
 
 
