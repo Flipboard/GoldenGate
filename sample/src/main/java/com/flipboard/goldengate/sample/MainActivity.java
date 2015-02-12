@@ -29,6 +29,12 @@ public class MainActivity extends ActionBarActivity {
         webview.postDelayed(new Runnable() {
             @Override
             public void run() {
+                bridge.getNavigator(new Callback<Navigator>() {
+                    @Override
+                    public void onResult(Navigator result) {
+                        Toast.makeText(MainActivity.this, result.platform, Toast.LENGTH_SHORT).show();
+                    }
+                });
                 bridge.getWindowWidth(new Callback<Float>() {
                     @Override
                     public void onResult(Float result) {

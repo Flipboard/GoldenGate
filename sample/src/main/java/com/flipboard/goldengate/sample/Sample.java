@@ -14,4 +14,7 @@ public interface Sample {
     @Property("window.innerWidth")
     void getWindowWidth(Callback<Float> width);
 
+    @Property("navigator")
+    void getNavigator(Callback<Navigator> navigator);
+
 }
