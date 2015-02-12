@@ -7,11 +7,11 @@ import com.flipboard.goldengate.Property;
 
 @Debug
 @Bridge
-public interface Flipmag {
+public interface Sample {
 
     void alert(String message);
 
     @Property("window.innerWidth")
-    void getWindowWidth(Callback<Float> innerWidth);
+    void getWindowWidth(Callback<Float> width);
 
 }

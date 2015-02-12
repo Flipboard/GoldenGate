@@ -9,7 +9,7 @@ import android.widget.Toast;
 
 import com.flipboard.goldengate.Callback;
 import com.flipboard.goldengate.R;
-import com.flipboard.goldengate.bridge.FlipmagBridge;
+import com.flipboard.goldengate.bridge.SampleBridge;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -24,13 +24,19 @@ public class MainActivity extends ActionBarActivity {
         webview.setWebViewClient(new WebViewClient());
         webview.setWebChromeClient(new WebChromeClient());
 
-        final FlipmagBridge bridge = new FlipmagBridge(webview);
-        bridge.getWindowWidth(new Callback<Float>() {
+        final SampleBridge bridge = new SampleBridge(webview);
+        webview.loadUrl("http://www.google.com");
+        webview.postDelayed(new Runnable() {
             @Override
-            public void onResult(Float result) {
-                Toast.makeText(MainActivity.this, "window width = " + result, Toast.LENGTH_SHORT).show();
+            public void run() {
+                bridge.getWindowWidth(new Callback<Float>() {
+                    @Override
+                    public void onResult(Float result) {
+                        Toast.makeText(MainActivity.this, "window width = " + result, Toast.LENGTH_SHORT).show();
+                    }
+                });
+                bridge.alert("tjena");
             }
-        });
-        bridge.alert("tjena");
+        }, 1000);
     }
 }
