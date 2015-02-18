@@ -22,6 +22,8 @@ sourceSets {
 uploadArchives {
     configuration = configurations.archives
     repositories.mavenDeployer {
+        beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
         repository(url: sonatypeRepo) {
             authentication(userName: sonatypeUsername, password: sonatypePassword)
         }
