@@ -36,21 +36,21 @@ uploadArchives {
             scm {
                 url 'https://github.com/Flipboard/GoldenGate.git'
             }
-        }
 
-        licenses {
-            license {
-                name 'BSD 3-Clause License'
-                url 'https://github.com/Flipboard/GoldenGate/blob/master/LICENSE'
-                distribution 'repo'
+            licenses {
+                license {
+                    name 'BSD 3-Clause License'
+                    url 'https://github.com/Flipboard/GoldenGate/blob/master/LICENSE'
+                    distribution 'repo'
+                }
             }
-        }
 
-        developers {
-            developer {
-                id 'emilsjolander'
-                name 'Emil Sjölander'
-                email 'esjolander@flipboard.com'
+            developers {
+                developer {
+                    id 'emilsjolander'
+                    name 'Emil Sjölander'
+                    email 'esjolander@flipboard.com'
+                }
             }
         }
     }
