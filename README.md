@@ -2,6 +2,26 @@ GoldenGate
 ==========
 GoldenGate is an Android annotation processor for generating type safe javascript bindings (Bridges). The library is very similar in usage to something like retrofit in that only an interface has to be declared and annotated (though retrofit does not do any compile time code generating). This annotated interface is at compile time used to generate an type safe wrapper around a webview for interfacing with the javascript.
 
+Installation
+------------
+Replace version `x.x.x` with the latest version under releases
+```groovy
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.4'
+    }
+}
+
+apply plugin: 'com.neenbedankt.android-apt'
+
+dependencies {
+    apt 'com.flipboard.goldengate:compiler:x.x.x'
+    compile 'com.flipboard.goldengate:api:x.x.x'
+}
+```
 Usage
 -----
 Start by creating an interface and annotate it with `@Bridge` and also add a method which you want to call in javascript.
