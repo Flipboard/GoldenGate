@@ -15,6 +15,7 @@ import com.squareup.javapoet.TypeSpec;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -47,12 +48,14 @@ public class BridgeInterface {
     }
 
     public void writeToFiler(Filer filer) throws IOException {
+        String packageName = getPackageName(type);
+
         // Build Bridge class
         TypeSpec.Builder bridge = TypeSpec.classBuilder(name + "Bridge")
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
                 .addSuperinterface(TypeName.get(type))
                 .superclass(JavaScriptBridge.class)
-                .addField(ClassName.get("com.flipboard.goldengate.bridge", name + "Bridge", "ResultBridge"), "resultBridge", Modifier.PRIVATE);
+                .addField(ClassName.get(packageName, name + "Bridge", "ResultBridge"), "resultBridge", Modifier.PRIVATE);
 
         Type callbacksMapType = new TypeToken<Map<String, Callback<String>>>(){}.getType();
         Type callbackType = new TypeToken<Callback<String>>(){}.getType();
@@ -107,8 +110,24 @@ public class BridgeInterface {
         }
 
         // Write source
-        JavaFile javaFile = JavaFile.builder("com.flipboard.goldengate.bridge", bridge.build()).build();
+        JavaFile javaFile = JavaFile.builder(packageName, bridge.build()).build();
         javaFile.writeTo(filer);
+    }
+
+    private String getPackageName(TypeMirror type) {
+        String[] parts = type.toString().split("\\.");
+        return join(Arrays.copyOfRange(parts, 0, parts.length - 1), ".");
+    }
+
+    private String join(String[] strings, String sep) {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i < strings.length; i++) {
+            stringBuilder.append(strings[i]);
+            if (i + 1 < strings.length) {
+                stringBuilder.append(sep);
+            }
+        }
+        return stringBuilder.toString();
     }
 
 }
