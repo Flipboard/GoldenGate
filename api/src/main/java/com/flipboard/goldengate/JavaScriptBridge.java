@@ -1,6 +1,5 @@
 package com.flipboard.goldengate;
 
-import android.util.Base64;
 import android.webkit.WebView;
 
 import java.util.Random;
@@ -31,12 +30,6 @@ public abstract class JavaScriptBridge {
             jsonSerializer = new GsonJsonSerializer();
         }
         return jsonSerializer.fromJson(json, type);
-    }
-
-    protected String randomUUID() {
-        byte[] randBytes = new byte[64];
-        random.nextBytes(randBytes);
-        return Base64.encodeToString(randBytes, Base64.URL_SAFE | Base64.NO_WRAP);
     }
 
     public static void setJsonSerializer(JsonSerializer serializer) {

@@ -3,7 +3,6 @@ package com.flipboard.goldengate;
 import android.webkit.WebView;
 
 import com.google.gson.reflect.TypeToken;
-import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.FieldSpec;
@@ -18,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
 
 import javax.annotation.processing.Filer;
 import javax.lang.model.element.Element;
@@ -55,9 +55,10 @@ public class BridgeInterface {
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
                 .addSuperinterface(TypeName.get(type))
                 .superclass(JavaScriptBridge.class)
-                .addField(ClassName.get(packageName, name + "Bridge", "ResultBridge"), "resultBridge", Modifier.PRIVATE);
+                .addField(ClassName.get(packageName, name + "Bridge", "ResultBridge"), "resultBridge", Modifier.PRIVATE)
+                .addField(AtomicLong.class, "receiverIds", Modifier.PRIVATE);
 
-        Type callbacksMapType = new TypeToken<Map<String, Callback<String>>>(){}.getType();
+        Type callbacksMapType = new TypeToken<Map<Long, Callback<String>>>(){}.getType();
         Type callbackType = new TypeToken<Callback<String>>(){}.getType();
 
         // Generate the result bridge
@@ -67,7 +68,7 @@ public class BridgeInterface {
                         .initializer("new $T<>()", HashMap.class)
                         .build())
                 .addMethod(MethodSpec.methodBuilder("registerCallback")
-                        .addParameter(String.class, "receiver")
+                        .addParameter(long.class, "receiver")
                         .addParameter(callbackType, "cb")
                         .addCode(CodeBlock.builder().addStatement("callbacks.put($N, $N)", "receiver", "cb").build())
                         .build())
@@ -78,7 +79,7 @@ public class BridgeInterface {
                         .addCode(CodeBlock.builder()
                                 .beginControlFlow("try")
                                     .addStatement("$T $N = new $T($N)", ClassName.get("org.json", "JSONObject"), "json", ClassName.get("org.json", "JSONObject"), "result")
-                                    .addStatement("$T $N = $N.getString($S)", String.class, "receiver", "json", "receiver")
+                                    .addStatement("$T $N = $N.getLong($S)", long.class, "receiver", "json", "receiver")
                                     .addStatement("$T $N = $N.get($S).toString()", String.class, "realResult", "json", "result")
                                     .addStatement("$N.remove($N).onResult($N)", "callbacks", "receiver", "realResult")
                                 .nextControlFlow("catch (org.json.JSONException e)")
@@ -95,6 +96,7 @@ public class BridgeInterface {
                         .addParameter(WebView.class, "webView")
                         .addStatement("super($N)", "webView")
                         .addStatement("this.$N = new ResultBridge()", "resultBridge")
+                        .addStatement("this.$N = new $T()", "receiverIds", AtomicLong.class)
                         .addStatement("this.$N.addJavascriptInterface($N, $L)", "webView", "resultBridge", "\"" + name + "\"")
                         .build()
         );

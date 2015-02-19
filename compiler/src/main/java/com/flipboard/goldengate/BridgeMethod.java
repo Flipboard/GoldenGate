@@ -48,8 +48,8 @@ public class BridgeMethod {
         if (callback != null) {
             methodSpec.addParameter(TypeName.get(callback.type), callback.name, Modifier.FINAL);
             methodSpec.addCode(CodeBlock.builder()
-                    .addStatement("$T uuid = randomUUID()", String.class)
-                    .add("this.resultBridge.registerCallback(uuid, new Callback<String>() {\n")
+                    .addStatement("$T id = receiverIds.incrementAndGet()", long.class)
+                    .add("this.resultBridge.registerCallback(id, new Callback<$T>() {\n", String.class)
                     .indent()
                     .add("@$T\n", Override.class)
                     .add("public void onResult(String result) {\n")
@@ -84,7 +84,7 @@ public class BridgeMethod {
                 methodSpec.addCode(codeBlock.build());
             } else {
                 CodeBlock.Builder codeBlock = CodeBlock.builder();
-                codeBlock.addStatement("$T javascript = \"$L.onResult(JSON.stringify({receiver:\\\"\"+uuid+\"\\\", result:JSON.stringify($L(\"+$L+\"))}));\"", String.class, bridge.name, name, parameterList);
+                codeBlock.addStatement("$T javascript = \"$L.onResult(JSON.stringify({receiver:\"+id+\", result:JSON.stringify($L(\"+$L+\"))}));\"", String.class, bridge.name, name, parameterList);
                 if (bridge.isDebug) {
                     codeBlock.addStatement("android.util.Log.d($S, javascript)", bridge.name);
                 }
@@ -102,7 +102,7 @@ public class BridgeMethod {
                 methodSpec.addCode(codeBlock.build());
             } else {
                 CodeBlock.Builder codeBlock = CodeBlock.builder();
-                codeBlock.addStatement("$T javascript = \"$L.onResult(JSON.stringify({receiver:\\\"\"+uuid+\"\\\", result:JSON.stringify($L())}));\"", String.class, bridge.name, name);
+                codeBlock.addStatement("$T javascript = \"$L.onResult(JSON.stringify({receiver:\"+id+\", result:JSON.stringify($L())}));\"", String.class, bridge.name, name);
                 if (bridge.isDebug) {
                     codeBlock.addStatement("android.util.Log.d($S, javascript)", bridge.name);
                 }
