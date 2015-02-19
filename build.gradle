@@ -18,3 +18,7 @@ allprojects {
         jcenter()
     }
 }
+
+def canUploadArchives() {
+    return project.hasProperty('sonatypeUsername') && project.hasProperty('sonatypePassword') && project.hasProperty('sonatypeRepo')
+}
