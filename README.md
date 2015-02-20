@@ -24,6 +24,27 @@ dependencies {
 ```
 Usage
 -----
+Before starting you will need to configure how object should be serialized to json. By default GoldenGate will use gson but does not package this dependency in case you would like to use something else. If you want to use gson add it as a dependency to your build.gradle.
+```java
+dependencies {
+    compile 'com.google.code.gson:gson:x.x.x'
+}
+```
+If you would like to use some other library like jackson or maybe a custom json implementation you can register a JsonSerializer with JavascriptBridge.
+```java
+JavaScriptBridge.setJsonSerializer(new JsonSerializer(){
+    @Override
+    <T> String toJson(T stuff) {
+        // do stuff
+    }
+
+    @Override
+    <T> T fromJson(String json, Class<T> type) {
+        // do stuff
+    }
+});
+```
+
 Start by creating an interface and annotate it with `@Bridge` and also add a method which you want to call in javascript.
 ```java
 @Bridge
