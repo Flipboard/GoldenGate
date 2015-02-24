@@ -104,6 +104,19 @@ interface MyJavascript {
 }
 ```
 
+Proguard
+--------
+
+If you use Proguard, you'll want to make sure you add the following to your config
+```
+# GoldenGate
+-keep class * extends com.flipboard.goldengate.JavaScriptBridge { *; }
+-keepattributes JavascriptInterface
+-keepclassmembers class ** {
+    @android.webkit.JavascriptInterface public *;
+}
+```
+
 Contributing
 ------------
 We welcome pull requests for bug fixes, new features, and improvements to GoldenGate. Contributors to the main GoldenGate repository must accept Flipboard's Apache-style [Individual Contributor License Agreement (CLA)](https://docs.google.com/forms/d/1gh9y6_i8xFn6pA15PqFeye19VqasuI9-bGp_e0owy74/viewform) before any changes can be merged.
