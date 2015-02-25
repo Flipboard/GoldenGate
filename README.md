@@ -31,7 +31,7 @@ dependencies {
 }
 ```
 If you would like to use some other library like jackson or maybe a custom json implementation you can register a JsonSerializer with JavascriptBridge.
-```groovy
+```java
 JavaScriptBridge.setJsonSerializer(new JsonSerializer(){
     @Override
     <T> String toJson(T stuff) {
