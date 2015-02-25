@@ -4,7 +4,7 @@ GoldenGate is an Android annotation processor for generating type safe javascrip
 
 Installation
 ------------
-Replace version `x.x.x` with the latest version under releases
+Replace version `x.x.x` with the latest version under [releases log](https://github.com/Flipboard/GoldenGate/releases)
 ```groovy
 buildscript {
     repositories {
