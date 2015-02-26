@@ -89,12 +89,25 @@ public class BridgeInterface {
                         .build())
                 .build());
 
-        // Add Bridge constructor
+        // Add Bridge constructor using globally configured json serializer
         bridge.addMethod(
                 MethodSpec.constructorBuilder()
                         .addModifiers(Modifier.PUBLIC)
                         .addParameter(WebView.class, "webView")
                         .addStatement("super($N)", "webView")
+                        .addStatement("this.$N = new ResultBridge()", "resultBridge")
+                        .addStatement("this.$N = new $T()", "receiverIds", AtomicLong.class)
+                        .addStatement("this.$N.addJavascriptInterface($N, $L)", "webView", "resultBridge", "\"" + name + "\"")
+                        .build()
+        );
+
+        // Add Bridge constructor using custom json serializer
+        bridge.addMethod(
+                MethodSpec.constructorBuilder()
+                        .addModifiers(Modifier.PUBLIC)
+                        .addParameter(WebView.class, "webView")
+                        .addParameter(JsonSerializer.class, "jsonSerializer")
+                        .addStatement("super($N, $N)", "webView", "jsonSerializer")
                         .addStatement("this.$N = new ResultBridge()", "resultBridge")
                         .addStatement("this.$N = new $T()", "receiverIds", AtomicLong.class)
                         .addStatement("this.$N.addJavascriptInterface($N, $L)", "webView", "resultBridge", "\"" + name + "\"")

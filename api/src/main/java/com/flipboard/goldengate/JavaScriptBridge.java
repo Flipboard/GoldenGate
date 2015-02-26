@@ -9,31 +9,31 @@ import java.util.Random;
  */
 public abstract class JavaScriptBridge {
 
-    private static JsonSerializer jsonSerializer;
+    private static JsonSerializer defaultJsonSerializer;
 
     private final Random random = new Random();
     protected final WebView webView;
+    private final JsonSerializer jsonSerializer;
 
     public JavaScriptBridge(WebView webView) {
+        this(webView, defaultJsonSerializer != null ? defaultJsonSerializer : new GsonJsonSerializer());
+    }
+
+    public JavaScriptBridge(WebView webView, JsonSerializer jsonSerializer) {
         this.webView = webView;
+        this.jsonSerializer = jsonSerializer;
     }
 
     protected <T> String toJson(T stuff) {
-        if (jsonSerializer == null) {
-            jsonSerializer = new GsonJsonSerializer();
-        }
         return jsonSerializer.toJson(stuff);
     }
 
     protected <T> T fromJson(String json, Class<T> type) {
-        if (jsonSerializer == null) {
-            jsonSerializer = new GsonJsonSerializer();
-        }
         return jsonSerializer.fromJson(json, type);
     }
 
     public static void setJsonSerializer(JsonSerializer serializer) {
-        jsonSerializer = serializer;
+        defaultJsonSerializer = serializer;
     }
 
 }
