@@ -2,6 +2,7 @@ package com.flipboard.goldengate.sample;
 
 import com.flipboard.goldengate.Bridge;
 import com.flipboard.goldengate.Callback;
+import com.flipboard.goldengate.JavascriptCallback;
 import com.flipboard.goldengate.Method;
 import com.flipboard.goldengate.Property;
 
@@ -28,5 +29,7 @@ public interface Test {
 
     @Method("otherName")
     void noParamMethodWithChangedName(Callback<String> callback);
+
+    void reportBackLater(@JavascriptCallback Callback<String> callback);
 
 }

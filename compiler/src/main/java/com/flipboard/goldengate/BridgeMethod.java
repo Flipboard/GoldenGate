@@ -5,6 +5,9 @@ import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.TypeName;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
@@ -14,28 +17,30 @@ public class BridgeMethod {
 
     public final String javaName;
     public final String name;
-    public final ArrayList<BridgeParameter> parameters = new ArrayList<>();
-    public final BridgeCallback callback;
+    public final List<BridgeParameter> parameters = new ArrayList<>();
+    public BridgeCallback callback;
 
     public BridgeMethod(ExecutableElement e) {
         this.javaName = e.getSimpleName().toString();
         this.name = e.getAnnotation(Method.class) != null ? e.getAnnotation(Method.class).value() : javaName;
 
-        for (int i = 0; i < e.getParameters().size() - 1; i++) {
+        for (int i = 0; i < e.getParameters().size(); i++) {
             VariableElement param = e.getParameters().get(i);
-            parameters.add(new BridgeParameter(param));
-        }
+            boolean isJavascriptCallback = param.getAnnotation(JavascriptCallback.class) != null;
 
-        if (e.getParameters().size() > 0) {
-            VariableElement lastParam = e.getParameters().get(e.getParameters().size() - 1);
-            if (Util.isCallback(lastParam)) {
-                callback = new BridgeCallback(lastParam);
+            if (i == e.getParameters().size() - 1 && Util.isCallback(param) && !isJavascriptCallback) {
+                callback = new BridgeCallback(param);
             } else {
-                callback = null;
-                parameters.add(new BridgeParameter(lastParam));
+                if (isJavascriptCallback) {
+                    if (Util.isCallback(param)) {
+                        parameters.add(new BridgeCallback(param));
+                    } else {
+                        throw new IllegalArgumentException("Param with annotation @JavascriptCallback must be of type com.flipboard.goldengate.Callback");
+                    }
+                } else {
+                    parameters.add(new BridgeParameter(param));
+                }
             }
-        } else {
-            callback = null;
         }
     }
 
@@ -62,11 +67,34 @@ public class BridgeMethod {
                     .build());
         }
 
+        methodSpec.addStatement("$T<$T, $T> idMap = new $T<>()", Map.class, String.class, Long.class, HashMap.class);
+        for (BridgeParameter parameter : parameters) {
+            if (parameter instanceof BridgeCallback) {
+                BridgeCallback callbackParameter = (BridgeCallback) parameter;
+                methodSpec.addCode(CodeBlock.builder()
+                        .addStatement("idMap.put($S, receiverIds.incrementAndGet())", callbackParameter.name)
+                        .add("this.resultBridge.registerCallback(idMap.get($S), new Callback<$T>() {\n", callbackParameter.name, String.class)
+                        .indent()
+                        .add("@$T\n", Override.class)
+                        .add("public void onResult(String result) {\n")
+                        .indent()
+                        .addStatement("$N.onResult(fromJson(result, $T.class))", callbackParameter.name, callbackParameter.genericType)
+                        .unindent()
+                        .add("}\n")
+                        .unindent()
+                        .addStatement("})")
+                        .build());
+            }
+        }
+
         if (parameters.size() > 0) {
             String parameterList = "";
             for (int i = 0; i < parameters.size(); i++) {
                 BridgeParameter parameter = parameters.get(i);
-                if (i < parameters.size()) {
+                if (parameter instanceof BridgeCallback) {
+                    BridgeCallback callbackParameter = (BridgeCallback) parameter;
+                    parameterList += "\"GoldenGate$$CreateCallback(\"+idMap.get(\"" + callbackParameter.name + "\")+\")\"";
+                } else if (i < parameters.size()) {
                     parameterList += "toJson(" + parameter.name + ")";
                 }
                 if (i < parameters.size()-1) {

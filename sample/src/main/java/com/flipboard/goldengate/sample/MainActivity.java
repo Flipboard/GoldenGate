@@ -1,7 +1,9 @@
 package com.flipboard.goldengate.sample;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -21,6 +23,9 @@ public class MainActivity extends ActionBarActivity {
         webview.getSettings().setJavaScriptEnabled(true);
         webview.setWebViewClient(new WebViewClient());
         webview.setWebChromeClient(new WebChromeClient());
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            webview.setWebContentsDebuggingEnabled(true);
+        }
 
         final SampleBridge bridge = new SampleBridge(webview);
         webview.loadUrl("http://www.google.com");
@@ -37,6 +42,12 @@ public class MainActivity extends ActionBarActivity {
                     @Override
                     public void onResult(Float result) {
                         Toast.makeText(MainActivity.this, "window width = " + result, Toast.LENGTH_SHORT).show();
+                    }
+                });
+                bridge.looptyLoop(new Callback<Integer>() {
+                    @Override
+                    public void onResult(Integer val) {
+                        Log.d("looptyLoop", "val: " + val);
                     }
                 });
                 bridge.alert("tjena");

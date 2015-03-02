@@ -95,9 +95,6 @@ public class BridgeInterface {
                         .addModifiers(Modifier.PUBLIC)
                         .addParameter(WebView.class, "webView")
                         .addStatement("super($N)", "webView")
-                        .addStatement("this.$N = new ResultBridge()", "resultBridge")
-                        .addStatement("this.$N = new $T()", "receiverIds", AtomicLong.class)
-                        .addStatement("this.$N.addJavascriptInterface($N, $L)", "webView", "resultBridge", "\"" + name + "\"")
                         .build()
         );
 
@@ -111,6 +108,12 @@ public class BridgeInterface {
                         .addStatement("this.$N = new ResultBridge()", "resultBridge")
                         .addStatement("this.$N = new $T()", "receiverIds", AtomicLong.class)
                         .addStatement("this.$N.addJavascriptInterface($N, $L)", "webView", "resultBridge", "\"" + name + "\"")
+                        .addCode("webView.loadUrl(\"javascript:\" +\n" +
+                                "                \"function GoldenGate$$$$CreateCallback(receiver) {\" +\n" +
+                                "                \"    return function(result) {\" +\n" +
+                                "                \"        $N.onResult(JSON.stringify({receiver: receiver, result: JSON.stringify(result)}))\" +\n" +
+                                "                \"    }\" +\n" +
+                                "                \"}\");", name)
                         .build()
         );
 
