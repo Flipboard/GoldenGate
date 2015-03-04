@@ -86,12 +86,21 @@ interface MyJavascript {
 }
 ```
 
-The `@Property` annotation should be used for when setting or getting a property on the javascript side of things. In this case the method may only have one parameter (either a callback for result or a value which should be set). Just like with the `@Method` delaration a custom name can be chosen for the property. The default name for properties however is the name of the parameter to the method.
+The `@Property` annotation should be used for when setting or getting a property on the javascript side of things. In this case the method may only have one parameter (either a callback for result or a value which should be set). Just like with the `@Method` declaration a custom name can be chosen for the property. The default name for properties however is the name of the parameter to the method.
 ```java
 @Bridge
 interface MyJavascript {
 	@Property("window.innerHeight")
 	void getWindowHeight(Callback<Integer> height);
+}
+```
+
+The `@JavascriptCallback` annotation should be used on method parameters of type `Callback` which will be passed to javascript as a javascript callback. This allows javascript functions to call back into your java code with a result at a later time, perhaps after a network request has finished.
+```java
+@Bridge
+interface MyJavascript {
+    @Method("[1,2,3,4,5,6,7,8,9,10].forEach")
+    void looptyLoop(@JavascriptCallback Callback<Integer> val);
 }
 ```
 
