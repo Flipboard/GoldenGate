@@ -12,6 +12,7 @@ import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -58,7 +59,7 @@ public class BridgeInterface {
                 .addField(ClassName.get(packageName, name + "Bridge", "ResultBridge"), "resultBridge", Modifier.PRIVATE)
                 .addField(AtomicLong.class, "receiverIds", Modifier.PRIVATE);
 
-        Type callbacksMapType = new TypeToken<Map<Long, Callback<String>>>(){}.getType();
+        Type callbacksMapType = new TypeToken<Map<Long, WeakReference<Callback<String>>>>(){}.getType();
         Type callbackType = new TypeToken<Callback<String>>(){}.getType();
 
         // Generate the result bridge
@@ -70,7 +71,7 @@ public class BridgeInterface {
                 .addMethod(MethodSpec.methodBuilder("registerCallback")
                         .addParameter(long.class, "receiver")
                         .addParameter(callbackType, "cb")
-                        .addCode(CodeBlock.builder().addStatement("callbacks.put($N, $N)", "receiver", "cb").build())
+                        .addCode(CodeBlock.builder().addStatement("callbacks.put($N, new $T($N))", "receiver", WeakReference.class, "cb").build())
                         .build())
                 .addMethod(MethodSpec.methodBuilder("onResult")
                         .addModifiers(Modifier.PUBLIC)
@@ -81,7 +82,10 @@ public class BridgeInterface {
                                     .addStatement("$T $N = new $T($N)", ClassName.get("org.json", "JSONObject"), "json", ClassName.get("org.json", "JSONObject"), "result")
                                     .addStatement("$T $N = $N.getLong($S)", long.class, "receiver", "json", "receiver")
                                     .addStatement("$T $N = $N.get($S).toString()", String.class, "realResult", "json", "result")
-                                    .addStatement("$N.remove($N).onResult($N)", "callbacks", "receiver", "realResult")
+                                    .addStatement("$T $N = $N.get($N).get()", callbackType, "callback", "callbacks", "receiver")
+                                    .beginControlFlow("if ($N != null) ", "callback")
+                                        .addStatement("$N.onResult($N)", "callback", "realResult")
+                                    .endControlFlow()
                                 .nextControlFlow("catch (org.json.JSONException e)")
                                     .addStatement("$N.printStackTrace()", "e")
                                 .endControlFlow()
