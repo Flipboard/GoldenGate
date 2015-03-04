@@ -95,6 +95,7 @@ public class BridgeInterface {
                         .addModifiers(Modifier.PUBLIC)
                         .addParameter(WebView.class, "webView")
                         .addStatement("super($N)", "webView")
+                        .addStatement("init()")
                         .build()
         );
 
@@ -105,16 +106,24 @@ public class BridgeInterface {
                         .addParameter(WebView.class, "webView")
                         .addParameter(JsonSerializer.class, "jsonSerializer")
                         .addStatement("super($N, $N)", "webView", "jsonSerializer")
-                        .addStatement("this.$N = new ResultBridge()", "resultBridge")
-                        .addStatement("this.$N = new $T()", "receiverIds", AtomicLong.class)
-                        .addStatement("this.$N.addJavascriptInterface($N, $L)", "webView", "resultBridge", "\"" + name + "\"")
-                        .addCode("webView.loadUrl(\"javascript:\" +\n" +
-                                "                \"function GoldenGate$$$$CreateCallback(receiver) {\" +\n" +
-                                "                \"    return function(result) {\" +\n" +
-                                "                \"        $N.onResult(JSON.stringify({receiver: receiver, result: JSON.stringify(result)}))\" +\n" +
-                                "                \"    }\" +\n" +
-                                "                \"}\");", name)
+                        .addStatement("init()")
                         .build()
+        );
+
+        // Add common init method for both constructors
+        bridge.addMethod(
+                MethodSpec.methodBuilder("init")
+                    .addModifiers(Modifier.PRIVATE)
+                    .addStatement("this.$N = new ResultBridge()", "resultBridge")
+                    .addStatement("this.$N = new $T()", "receiverIds", AtomicLong.class)
+                    .addStatement("this.$N.addJavascriptInterface($N, $L)", "webView", "resultBridge", "\"" + name + "\"")
+                    .addCode("webView.loadUrl(\"javascript:\" +\n" +
+                            "                \"function GoldenGate$$$$CreateCallback(receiver) {\" +\n" +
+                            "                \"    return function(result) {\" +\n" +
+                            "                \"        $N.onResult(JSON.stringify({receiver: receiver, result: JSON.stringify(result)}))\" +\n" +
+                            "                \"    }\" +\n" +
+                            "                \"}\");", name)
+                    .build()
         );
 
         // Add Bridge methods
