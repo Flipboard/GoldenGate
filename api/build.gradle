@@ -37,7 +37,7 @@ if (canUploadArchives()) {
 
             pom.project {
                 name 'GoldenGate'
-                packaging 'jar'
+                packaging 'aar'
                 description 'Generate type safe java bridge into webview javascript code'
                 url 'https://github.com/flipboard/GoldenGate'
 
