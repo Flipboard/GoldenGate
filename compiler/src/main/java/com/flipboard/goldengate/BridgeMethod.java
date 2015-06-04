@@ -108,7 +108,7 @@ public class BridgeMethod {
                 if (bridge.isDebug) {
                     codeBlock.addStatement("android.util.Log.d($S, javascript)", bridge.name);
                 }
-                codeBlock.addStatement("this.webView.loadUrl(\"javascript:\" + javascript)");
+                codeBlock.addStatement("evaluateJavascript(javascript)");
                 methodSpec.addCode(codeBlock.build());
             } else {
                 CodeBlock.Builder codeBlock = CodeBlock.builder();
@@ -116,7 +116,7 @@ public class BridgeMethod {
                 if (bridge.isDebug) {
                     codeBlock.addStatement("android.util.Log.d($S, javascript)", bridge.name);
                 }
-                codeBlock.addStatement("this.webView.loadUrl(\"javascript:\" + javascript)");
+                codeBlock.addStatement("evaluateJavascript(javascript)");
                 methodSpec.addCode(codeBlock.build());
             }
         } else {
@@ -126,7 +126,7 @@ public class BridgeMethod {
                 if (bridge.isDebug) {
                     codeBlock.addStatement("android.util.Log.d($S, javascript)", bridge.name);
                 }
-                codeBlock.addStatement("this.webView.loadUrl(\"javascript:\" + javascript)");
+                codeBlock.addStatement("evaluateJavascript(javascript)");
                 methodSpec.addCode(codeBlock.build());
             } else {
                 CodeBlock.Builder codeBlock = CodeBlock.builder();
@@ -134,7 +134,7 @@ public class BridgeMethod {
                 if (bridge.isDebug) {
                     codeBlock.addStatement("android.util.Log.d($S, javascript)", bridge.name);
                 }
-                codeBlock.addStatement("this.webView.loadUrl(\"javascript:\" + javascript)");
+                codeBlock.addStatement("evaluateJavascript(javascript)");
                 methodSpec.addCode(codeBlock.build());
             }
         }
