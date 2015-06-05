@@ -62,7 +62,7 @@ public class BridgeInterface {
                 .addField(ClassName.get(packageName, name + "Bridge", "ResultBridge"), "resultBridge", Modifier.PRIVATE)
                 .addField(AtomicLong.class, "receiverIds", Modifier.PRIVATE);
 
-        Type callbacksMapType = new TypeToken<Map<Long, WeakReference<Callback<String>>>>(){}.getType();
+        Type callbacksMapType = new TypeToken<Map<Long, Callback<String>>>(){}.getType();
         Type callbackType = new TypeToken<Callback<String>>(){}.getType();
 
         // Generate the result bridge
@@ -74,7 +74,7 @@ public class BridgeInterface {
                 .addMethod(MethodSpec.methodBuilder("registerCallback")
                         .addParameter(long.class, "receiver")
                         .addParameter(callbackType, "cb")
-                        .addCode(CodeBlock.builder().addStatement("callbacks.put($N, new $T($N))", "receiver", WeakReference.class, "cb").build())
+                        .addCode(CodeBlock.builder().addStatement("callbacks.put($N, $N)", "receiver", "cb").build())
                         .build())
                 .addMethod(MethodSpec.methodBuilder("onResult")
                         .addModifiers(Modifier.PUBLIC)
@@ -85,9 +85,16 @@ public class BridgeInterface {
                                     .addStatement("$T $N = new $T($N)", ClassName.get("org.json", "JSONObject"), "json", ClassName.get("org.json", "JSONObject"), "result")
                                     .addStatement("$T $N = $N.getLong($S)", long.class, "receiver", "json", "receiver")
                                     .addStatement("$T $N = $N.get($S).toString()", String.class, "realResult", "json", "result")
-                                    .addStatement("$T $N = $N.get($N).get()", callbackType, "callback", "callbacks", "receiver")
+                                    .addStatement("$T $N = $N.get($N)", callbackType, "callback", "callbacks", "receiver")
                                     .beginControlFlow("if ($N != null) ", "callback")
                                         .addStatement("$N.onResult($N)", "callback", "realResult")
+                                        .addStatement("$T $N = false", boolean.class, "keepAlive")
+                                        .beginControlFlow("if ($N.has($S))", "json", "keepAlive")
+                                            .addStatement("$N = $N.getBoolean($S)", "keepAlive", "json", "keepAlive")
+                                        .endControlFlow()
+                                        .beginControlFlow("if (!$N)", "keepAlive")
+                                            .addStatement("$N.remove($N)", "callbacks", "receiver")
+                                        .endControlFlow()
                                     .endControlFlow()
                                 .nextControlFlow("catch (org.json.JSONException e)")
                                     .addStatement("$N.printStackTrace()", "e")
@@ -127,7 +134,7 @@ public class BridgeInterface {
                     .addCode("evaluateJavascript(\n" +
                             "                \"function GoldenGate$$$$CreateCallback(receiver) {\" +\n" +
                             "                \"    return function(result) {\" +\n" +
-                            "                \"        $N.onResult(JSON.stringify({receiver: receiver, result: JSON.stringify(result)}))\" +\n" +
+                            "                \"        $N.onResult(JSON.stringify({receiver: receiver, keepAlive: true, result: JSON.stringify(result)}))\" +\n" +
                             "                \"    }\" +\n" +
                             "                \"}\");", name)
                     .build()
