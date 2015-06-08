@@ -1,6 +1,5 @@
 apply plugin: 'java'
-apply plugin: 'maven'
-apply plugin: 'signing'
+apply plugin: 'bintray-release'
 
 sourceCompatibility = 1.7
 
@@ -12,79 +11,20 @@ sourceSets {
     }
 }
 
-configurations {
-    archives {
-        extendsFrom configurations.default
-    }
-}
-
-version = "1.4.0"
-group = "com.flipboard.goldengate"
-
-if (canUploadArchives()) {
-    uploadArchives {
-        configuration = configurations.archives
-        repositories.mavenDeployer {
-            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-
-            repository(url: sonatypeRepo) {
-                authentication(userName: sonatypeUsername, password: sonatypePassword)
-            }
-
-            pom.project {
-                name 'GoldenGate'
-                packaging 'jar'
-                description 'Generate type safe java bridge into webview javascript code'
-                url 'https://github.com/flipboard/GoldenGate'
-
-                scm {
-                    url 'https://github.com/Flipboard/GoldenGate.git'
-                }
-
-                licenses {
-                    license {
-                        name 'BSD 3-Clause License'
-                        url 'https://github.com/Flipboard/GoldenGate/blob/master/LICENSE'
-                        distribution 'repo'
-                    }
-                }
-
-                developers {
-                    developer {
-                        id 'emilsjolander'
-                        name 'Emil Sjölander'
-                        email 'esjolander@flipboard.com'
-                    }
-                }
-            }
-        }
-    }
-}
-
-signing {
-    required { has("release") && gradle.taskGraph.hasTask("uploadArchives") }
-    sign configurations.archives
-}
-
-task sourcesJar(type: Jar, dependsOn: classes) {
-    classifier = 'sources'
-    from sourceSets.main.allSource
-}
-
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
-    from javadoc.destinationDir
-}
-
-artifacts {
-    archives sourcesJar
-    archives javadocJar
-}
-
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile project(':api')
     compile 'com.squareup:javapoet:1.0.0'
     compile 'com.google.android:android:4.1.1.4'
     compile 'com.google.code.gson:gson:2.3.1'
+}
+
+publish {
+    userOrg = 'flipboard'
+    groupId = 'com.flipboard'
+    artifactId = 'goldengate-compiler'
+    version = VERSION
+    description = 'Generate type safe java bridge into webview javascript code.'
+    website = 'https://github.com/flipboard/goldengate'
+    licences = ['BSD 3-Clause']
 }

@@ -1,5 +1,6 @@
 package com.flipboard.goldengate.sample;
 
+import android.annotation.TargetApi;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
@@ -14,6 +15,7 @@ import com.flipboard.goldengate.Callback;
 
 public class MainActivity extends ActionBarActivity {
 
+    @TargetApi(Build.VERSION_CODES.KITKAT)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
