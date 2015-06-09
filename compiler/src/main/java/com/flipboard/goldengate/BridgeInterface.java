@@ -18,7 +18,6 @@ import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
@@ -27,6 +26,7 @@ import javax.annotation.processing.Filer;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
+import javax.lang.model.element.PackageElement;
 import javax.lang.model.type.TypeMirror;
 
 public class BridgeInterface {
@@ -162,19 +162,11 @@ public class BridgeInterface {
     }
 
     private String getPackageName(TypeMirror type) {
-        String[] parts = type.toString().split("\\.");
-        return join(Arrays.copyOfRange(parts, 0, parts.length - 1), ".");
-    }
-
-    private String join(String[] strings, String sep) {
-        StringBuilder stringBuilder = new StringBuilder();
-        for (int i = 0; i < strings.length; i++) {
-            stringBuilder.append(strings[i]);
-            if (i + 1 < strings.length) {
-                stringBuilder.append(sep);
-            }
+        Element element = Processor.instance.typeUtils.asElement(type);
+        while (!(element instanceof PackageElement)) {
+            element = element.getEnclosingElement();
         }
-        return stringBuilder.toString();
+        return ((PackageElement) element).getQualifiedName().toString();
     }
 
 }
