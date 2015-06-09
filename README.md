@@ -17,8 +17,8 @@ buildscript {
 apply plugin: 'com.neenbedankt.android-apt'
 
 dependencies {
-    apt 'com.flipboard:goldengate-compiler:1.4.1'
-    compile 'com.flipboard:goldengate-api:1.4.1'
+    apt 'com.flipboard:goldengate-compiler:1.4.2'
+    compile 'com.flipboard:goldengate-api:1.4.2'
 }
 ```
 Usage
