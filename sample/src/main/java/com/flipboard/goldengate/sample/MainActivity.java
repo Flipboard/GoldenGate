@@ -1,9 +1,9 @@
 package com.flipboard.goldengate.sample;
 
-import android.annotation.TargetApi;
+import android.annotation.SuppressLint;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
@@ -13,9 +13,9 @@ import android.widget.Toast;
 import com.flipboard.goldengate.Callback;
 
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends AppCompatActivity {
 
-    @TargetApi(Build.VERSION_CODES.KITKAT)
+    @SuppressLint("SetJavaScriptEnabled")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -26,11 +26,11 @@ public class MainActivity extends ActionBarActivity {
         webview.setWebViewClient(new WebViewClient());
         webview.setWebChromeClient(new WebChromeClient());
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            webview.setWebContentsDebuggingEnabled(true);
+            WebView.setWebContentsDebuggingEnabled(true);
         }
 
         final SampleBridge bridge = new SampleBridge(webview);
-        webview.loadUrl("http://www.google.com");
+        webview.loadUrl("https://flipboard.com/@news/the-daily-edition-3adc9613z");
         webview.postDelayed(new Runnable() {
             @Override
             public void run() {
