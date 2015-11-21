@@ -57,7 +57,7 @@ public class Processor extends AbstractProcessor {
             }
 
             try {
-                new BridgeInterface(annotatedElement).writeToFiler(filer);
+                new BridgeInterface(annotatedElement, elementUtils, typeUtils).writeToFiler(filer);
             } catch (Exception e) {
                 error(annotatedElement, "%s", e.getMessage());
             }
