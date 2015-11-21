@@ -120,7 +120,7 @@ public class BridgeMethod {
                 if (bridge.isDebug) {
                     codeBlock.addStatement("android.util.Log.d($S, javascript)", bridge.name);
                 }
-                codeBlock.addStatement("evaluateJavascript(javascript)");
+                codeBlock.addStatement("evaluateJavascript(webView, javascript)");
                 methodSpec.addCode(codeBlock.build());
             } else {
                 CodeBlock.Builder codeBlock = CodeBlock.builder();
@@ -128,7 +128,7 @@ public class BridgeMethod {
                 if (bridge.isDebug) {
                     codeBlock.addStatement("android.util.Log.d($S, javascript)", bridge.name);
                 }
-                codeBlock.addStatement("evaluateJavascript(javascript)");
+                codeBlock.addStatement("evaluateJavascript(webView, javascript)");
                 methodSpec.addCode(codeBlock.build());
             }
         } else {
@@ -138,7 +138,7 @@ public class BridgeMethod {
                 if (bridge.isDebug) {
                     codeBlock.addStatement("android.util.Log.d($S, javascript)", bridge.name);
                 }
-                codeBlock.addStatement("evaluateJavascript(javascript)");
+                codeBlock.addStatement("evaluateJavascript(webView, javascript)");
                 methodSpec.addCode(codeBlock.build());
             } else {
                 CodeBlock.Builder codeBlock = CodeBlock.builder();
@@ -146,7 +146,7 @@ public class BridgeMethod {
                 if (bridge.isDebug) {
                     codeBlock.addStatement("android.util.Log.d($S, javascript)", bridge.name);
                 }
-                codeBlock.addStatement("evaluateJavascript(javascript)");
+                codeBlock.addStatement("evaluateJavascript(webView, javascript)");
                 methodSpec.addCode(codeBlock.build());
             }
         }

@@ -1,11 +1,8 @@
 package com.flipboard.goldengate;
 
-import android.annotation.TargetApi;
-import android.os.Build;
 import android.webkit.WebView;
 
 import com.google.gson.reflect.TypeToken;
-import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.FieldSpec;
@@ -145,7 +142,7 @@ public class BridgeInterface {
                         .addStatement("this.$N = new $T()", "receiverIds", AtomicLong.class)
                         .addStatement("this.$N.addJavascriptInterface($N, $L)", "webView", "resultBridge",
                                 "\"" + name + "\"")
-                        .addCode("evaluateJavascript(\n" +
+                        .addCode("evaluateJavascript(webView, \n" +
                                 "                \"function GoldenGate$$$$CreateCallback(receiver) {\" +\n" +
                                 "                \"    return function(result) {\" +\n" +
                                 "                \"        $N.onResult(JSON.stringify({receiver: receiver, result: JSON.stringify(result)}))\" +\n"
@@ -155,19 +152,6 @@ public class BridgeInterface {
                         .build()
             );
         }
-
-        bridge.addMethod(
-                MethodSpec.methodBuilder("evaluateJavascript")
-                        .addModifiers(Modifier.PRIVATE)
-                        .addAnnotation(AnnotationSpec.builder(TargetApi.class).addMember("value", "$T.VERSION_CODES.KITKAT", Build.class).build())
-                        .addParameter(String.class, "javascript")
-                        .beginControlFlow("if ($T.VERSION.SDK_INT >= $T.VERSION_CODES.KITKAT)", Build.class, Build.class)
-                        .addStatement("this.$N.evaluateJavascript($N, null)", "webView", "javascript")
-                        .nextControlFlow("else ")
-                        .addStatement("this.$N.loadUrl(\"javascript:\" + $N)", "webView", "javascript")
-                        .endControlFlow()
-                        .build()
-        );
 
         // Add Bridge methods
         for (BridgeMethod method : bridgeMethods) {

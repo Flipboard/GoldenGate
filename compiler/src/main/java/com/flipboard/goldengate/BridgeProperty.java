@@ -55,7 +55,7 @@ public class BridgeProperty {
             if (bridge.isDebug) {
                 codeBlock.addStatement("android.util.Log.d($S, javascript)", bridge.name);
             }
-            codeBlock.addStatement("evaluateJavascript(javascript)");
+            codeBlock.addStatement("evaluateJavascript(webView, javascript)");
             methodSpec.addCode(codeBlock.build());
         } else {
             methodSpec.addParameter(TypeName.get(parameter.type), parameter.name, Modifier.FINAL);
@@ -64,7 +64,7 @@ public class BridgeProperty {
             if (bridge.isDebug) {
                 codeBlock.addStatement("android.util.Log.d($S, javascript)", bridge.name);
             }
-            codeBlock.addStatement("evaluateJavascript(javascript)");
+            codeBlock.addStatement("evaluateJavascript(webView, javascript)");
             methodSpec.addCode(codeBlock.build());
         }
 
