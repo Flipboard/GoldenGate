@@ -1,5 +1,7 @@
 package com.flipboard.goldengate;
 
+import android.annotation.TargetApi;
+import android.os.Build;
 import android.webkit.WebView;
 
 import java.util.Random;
@@ -34,6 +36,15 @@ public abstract class JavaScriptBridge {
 
     public static void setJsonSerializer(JsonSerializer serializer) {
         defaultJsonSerializer = serializer;
+    }
+
+    @TargetApi(Build.VERSION_CODES.KITKAT)
+    protected static void evaluateJavascript(WebView webView, String javascript) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            webView.evaluateJavascript(javascript, null);
+        } else  {
+            webView.loadUrl("javascript:" + javascript);
+        }
     }
 
 }

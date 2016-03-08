@@ -12,6 +12,9 @@ import java.util.Map;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.TypeMirror;
+import javax.lang.model.util.Elements;
+import javax.lang.model.util.Types;
 
 public class BridgeMethod {
 
@@ -19,10 +22,13 @@ public class BridgeMethod {
     public final String name;
     public final List<BridgeParameter> parameters = new ArrayList<>();
     public BridgeCallback callback;
+    public boolean hasCallbackParameters = false;
 
-    public BridgeMethod(ExecutableElement e) {
+    public BridgeMethod(ExecutableElement e, Elements elementUtils, Types typeUtils) {
         this.javaName = e.getSimpleName().toString();
         this.name = e.getAnnotation(Method.class) != null ? e.getAnnotation(Method.class).value() : javaName;
+
+        TypeMirror callbackMirror = Util.typeFromClass(typeUtils, elementUtils, Callback.class);
 
         for (int i = 0; i < e.getParameters().size(); i++) {
             VariableElement param = e.getParameters().get(i);
@@ -34,10 +40,14 @@ public class BridgeMethod {
                 if (isJavascriptCallback) {
                     if (Util.isCallback(param)) {
                         parameters.add(new BridgeCallback(param));
+                        hasCallbackParameters = true;
                     } else {
                         throw new IllegalArgumentException("Param with annotation @JavascriptCallback must be of type com.flipboard.goldengate.Callback");
                     }
                 } else {
+                    if (typeUtils.isSameType(param.asType(), callbackMirror)) {
+                        hasCallbackParameters = true;
+                    }
                     parameters.add(new BridgeParameter(param));
                 }
             }
@@ -67,7 +77,9 @@ public class BridgeMethod {
                     .build());
         }
 
-        methodSpec.addStatement("$T<$T, $T> idMap = new $T<>()", Map.class, String.class, Long.class, HashMap.class);
+        if (hasCallbackParameters) {
+            methodSpec.addStatement("$T<$T, $T> idMap = new $T<>()", Map.class, String.class, Long.class, HashMap.class);
+        }
         for (BridgeParameter parameter : parameters) {
             if (parameter instanceof BridgeCallback) {
                 BridgeCallback callbackParameter = (BridgeCallback) parameter;
@@ -108,7 +120,7 @@ public class BridgeMethod {
                 if (bridge.isDebug) {
                     codeBlock.addStatement("android.util.Log.d($S, javascript)", bridge.name);
                 }
-                codeBlock.addStatement("evaluateJavascript(javascript)");
+                codeBlock.addStatement("evaluateJavascript(webView, javascript)");
                 methodSpec.addCode(codeBlock.build());
             } else {
                 CodeBlock.Builder codeBlock = CodeBlock.builder();
@@ -116,7 +128,7 @@ public class BridgeMethod {
                 if (bridge.isDebug) {
                     codeBlock.addStatement("android.util.Log.d($S, javascript)", bridge.name);
                 }
-                codeBlock.addStatement("evaluateJavascript(javascript)");
+                codeBlock.addStatement("evaluateJavascript(webView, javascript)");
                 methodSpec.addCode(codeBlock.build());
             }
         } else {
@@ -126,7 +138,7 @@ public class BridgeMethod {
                 if (bridge.isDebug) {
                     codeBlock.addStatement("android.util.Log.d($S, javascript)", bridge.name);
                 }
-                codeBlock.addStatement("evaluateJavascript(javascript)");
+                codeBlock.addStatement("evaluateJavascript(webView, javascript)");
                 methodSpec.addCode(codeBlock.build());
             } else {
                 CodeBlock.Builder codeBlock = CodeBlock.builder();
@@ -134,7 +146,7 @@ public class BridgeMethod {
                 if (bridge.isDebug) {
                     codeBlock.addStatement("android.util.Log.d($S, javascript)", bridge.name);
                 }
-                codeBlock.addStatement("evaluateJavascript(javascript)");
+                codeBlock.addStatement("evaluateJavascript(webView, javascript)");
                 methodSpec.addCode(codeBlock.build());
             }
         }
